@@ -1,5 +1,5 @@
 import streamlit as st
-
+# Code for UI
 st.set_page_config(page_title="AI Art Director", page_icon="🎨")
 
 st.title("🎨 AI Art Director")
