@@ -1,4 +1,4 @@
 streamlit
-anthropic
+google-generativeai
 replicate
 python-dotenv
