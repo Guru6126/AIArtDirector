@@ -1,0 +1,2 @@
+AI Art Director is a Generative AI web application that takes a brand name and description as input and automatically produces a complete brand identity kit — including a tagline, color palette, ad copy variations, and a logo concept image — all in one click.
+Built for small business owners, startups, student entrepreneurs, and content creators who need professional branding without the $2000+ designer price tag.
