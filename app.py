@@ -3,6 +3,17 @@ from dotenv import load_dotenv
 import os
 import time
 
+def display_image(image_url):
+    """Display image from URL returned by image_gen.py"""
+    try:
+        st.image(
+            image_url,
+            caption="AI Generated Logo Concept",
+            use_column_width=True
+        )
+    except Exception as e:
+        st.error("❌ Could not load image. Please try regenerating.")
+
 # Load API keys from .env
 load_dotenv()
 
@@ -78,9 +89,15 @@ with col2:
         if not brand_name or not brand_desc:
             st.warning("⚠️ Please fill in Brand Name and Description.")
         else:
-            with st.spinner("✨ Generating your brand kit... please wait"):
-                # API calls will go here in Day 3 and Day 4
-                time.sleep(2)  # Temporary placeholder delay
+            # Spinner for brand copy
+            with st.spinner("📝 Generating brand copy..."):
+                time.sleep(2)  # Claude API call will replace this on Day 4
+                st.success("✅ Brand copy ready!")
+
+            # Spinner specifically for image generation
+            with st.spinner("🖼️ Generating logo concept... this may take 10-15 seconds"):
+                time.sleep(3)  # Replicate API call will replace this on Day 4
+                st.success("✅ Logo concept ready!")
 
             # Tagline placeholder
             st.markdown("#### 🏷️ Brand Tagline")
@@ -102,8 +119,14 @@ with col2:
 
             # Logo image placeholder
             st.markdown("#### 🖼️ Logo Concept")
-            st.info("Your AI-generated logo will appear here")
-
+            # Placeholder image using a sample URL
+            sample_image_url = "https://via.placeholder.com/400x400.png?text=Logo+Will+Appear+Here"
+            display_image(sample_image_url)
+            st.image(
+                sample_image_url,
+                caption="AI Generated Logo Concept",
+                use_column_width=True
+            )
     else:
         st.markdown(
             """
