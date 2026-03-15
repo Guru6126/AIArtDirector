@@ -1,18 +1,8 @@
 import streamlit as st
 from dotenv import load_dotenv
+from brand_copy import generate_brand_copy
+from image_gen import generate_logo
 import os
-import time
-
-def display_image(image_url):
-    """Display image from URL returned by image_gen.py"""
-    try:
-        st.image(
-            image_url,
-            caption="AI Generated Logo Concept",
-            use_column_width=True
-        )
-    except Exception as e:
-        st.error("❌ Could not load image. Please try regenerating.")
 
 # Load API keys from .env
 load_dotenv()
@@ -67,9 +57,9 @@ with col1:
 
     # Example button
     if st.button("✨ Try an Example"):
-        brand_name = "GreenBrew"
-        brand_desc = "Eco-friendly coffee shop targeting young professionals who care about sustainability"
-        target_audience = "Young professionals aged 25-35"
+        st.session_state["brand_name"] = "GreenBrew"
+        st.session_state["brand_desc"] = "Eco-friendly coffee shop targeting young professionals who care about sustainability"
+        st.session_state["target_audience"] = "Young professionals aged 25-35"
         st.info("Example loaded! Click Generate to see it in action.")
 
     st.markdown("---")
@@ -89,44 +79,59 @@ with col2:
         if not brand_name or not brand_desc:
             st.warning("⚠️ Please fill in Brand Name and Description.")
         else:
-            # Spinner for brand copy
+            # Generate brand copy
             with st.spinner("📝 Generating brand copy..."):
-                time.sleep(2)  # Claude API call will replace this on Day 4
-                st.success("✅ Brand copy ready!")
+                try:
+                    brand_data = generate_brand_copy(brand_name, brand_desc, industry)
+                    st.success("✅ Brand copy ready!")
+                except Exception as e:
+                    st.error(f"❌ Brand copy generation failed: {str(e)}")
+                    brand_data = None
 
-            # Spinner specifically for image generation
+            # Generate logo
             with st.spinner("🖼️ Generating logo concept... this may take 10-15 seconds"):
-                time.sleep(3)  # Replicate API call will replace this on Day 4
-                st.success("✅ Logo concept ready!")
+                try:
+                    colors = ", ".join([c["name"] for c in brand_data["colors"]]) if brand_data else ""
+                    image_path = generate_logo(brand_name, brand_desc, colors)
+                    st.success("✅ Logo concept ready!")
+                except Exception as e:
+                    st.error(f"❌ Logo generation failed: {str(e)}")
+                    image_path = None
 
-            # Tagline placeholder
-            st.markdown("#### 🏷️ Brand Tagline")
-            st.info("Your AI-generated tagline will appear here")
+            # Display results
+            if brand_data:
 
-            st.markdown("---")
+                # Tagline
+                st.markdown("#### 🏷️ Brand Tagline")
+                st.info(brand_data["tagline"])
+                st.markdown("---")
 
-            # Color palette placeholder
-            st.markdown("#### 🎨 Color Palette")
-            st.info("Your 5-color palette will appear here")
+                # Color palette
+                st.markdown("#### 🎨 Color Palette")
+                cols = st.columns(5)
+                for i, color in enumerate(brand_data["colors"]):
+                    with cols[i]:
+                        st.markdown(
+                            f'<div style="background:{color["hex"]}; '
+                            f'padding:30px; border-radius:8px;"></div>',
+                            unsafe_allow_html=True
+                        )
+                        st.caption(f"{color['name']}\n{color['hex']}")
+                st.markdown("---")
 
-            st.markdown("---")
+                # Ad copies
+                st.markdown("#### 📢 Ad Copy")
+                for i, copy in enumerate(brand_data["ad_copies"], 1):
+                    st.success(f"{i}. {copy}")
+                st.markdown("---")
 
-            # Ad copy placeholder
-            st.markdown("#### 📢 Ad Copy")
-            st.info("Your 3 ad copy variations will appear here")
-
-            st.markdown("---")
-
-            # Logo image placeholder
+            # Display logo
             st.markdown("#### 🖼️ Logo Concept")
-            # Placeholder image using a sample URL
-            sample_image_url = "https://via.placeholder.com/400x400.png?text=Logo+Will+Appear+Here"
-            display_image(sample_image_url)
-            st.image(
-                sample_image_url,
-                caption="AI Generated Logo Concept",
-                use_column_width=True
-            )
+            if image_path:
+                st.image(image_path, caption=f"{brand_name} Logo Concept")
+            else:
+                st.warning("⚠️ Logo generation failed — try again!")
+
     else:
         st.markdown(
             """
@@ -142,6 +147,6 @@ with col2:
 # Footer
 st.markdown("---")
 st.markdown(
-    "<p style='text-align:center; color:gray;'>Built with Claude API + Stable Diffusion</p>",
+    "<p style='text-align:center; color:gray;'>Built with Groq API + Hugging Face</p>",
     unsafe_allow_html=True
 )
