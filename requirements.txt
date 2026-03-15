@@ -1,4 +1,4 @@
 streamlit
 groq
-replicate
-python-dotenv
+requests
+python-dotenv 
