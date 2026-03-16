@@ -139,13 +139,11 @@ with col2:
 
             # Display logo
             st.markdown("#### 🖼️ Logo Concept")
-<<<<<<< HEAD
             if image_path:
                 st.image(image_path, caption=f"{brand_name} Logo Concept")
             else:
                 st.warning("⚠️ Logo generation failed — try again!")
 
-=======
             # Placeholder image using a sample URL
             sample_image_url = "https://via.placeholder.com/400x400.png?text=Logo+Will+Appear+Here"
             display_image(sample_image_url)
@@ -154,7 +152,6 @@ with col2:
                 caption="AI Generated Logo Concept",
                 width=400
             )
->>>>>>> feature/ui-pipeline
     else:
         st.markdown(
             """
