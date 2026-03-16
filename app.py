@@ -9,7 +9,7 @@ def display_image(image_url):
         st.image(
             image_url,
             caption="AI Generated Logo Concept",
-            use_column_width=True
+            width=400
         )
     except Exception as e:
         st.error("❌ Could not load image. Please try regenerating.")
@@ -78,7 +78,7 @@ with col1:
     generate_btn = st.button(
         "🚀 Generate Brand Kit",
         type="primary",
-        use_container_width=True
+        width=400
     )
 
 # Output column
@@ -125,7 +125,7 @@ with col2:
             st.image(
                 sample_image_url,
                 caption="AI Generated Logo Concept",
-                use_column_width=True
+                width=400
             )
     else:
         st.markdown(
