@@ -3,6 +3,18 @@ from dotenv import load_dotenv
 from brand_copy import generate_brand_copy
 from image_gen import generate_logo
 import os
+import time
+
+def display_image(image_url):
+    """Display image from URL returned by image_gen.py"""
+    try:
+        st.image(
+            image_url,
+            caption="AI Generated Logo Concept",
+            width=400
+        )
+    except Exception as e:
+        st.error("❌ Could not load image. Please try regenerating.")
 
 # Load API keys from .env
 load_dotenv()
@@ -68,7 +80,7 @@ with col1:
     generate_btn = st.button(
         "🚀 Generate Brand Kit",
         type="primary",
-        use_container_width=True
+        width=400
     )
 
 # Output column
@@ -127,11 +139,22 @@ with col2:
 
             # Display logo
             st.markdown("#### 🖼️ Logo Concept")
+<<<<<<< HEAD
             if image_path:
                 st.image(image_path, caption=f"{brand_name} Logo Concept")
             else:
                 st.warning("⚠️ Logo generation failed — try again!")
 
+=======
+            # Placeholder image using a sample URL
+            sample_image_url = "https://via.placeholder.com/400x400.png?text=Logo+Will+Appear+Here"
+            display_image(sample_image_url)
+            st.image(
+                sample_image_url,
+                caption="AI Generated Logo Concept",
+                width=400
+            )
+>>>>>>> feature/ui-pipeline
     else:
         st.markdown(
             """
