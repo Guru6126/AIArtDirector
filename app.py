@@ -27,13 +27,15 @@ with col1:
 
     brand_name = st.text_input(
         "Brand Name",
-        placeholder="e.g. GreenBrew"
+        placeholder="e.g. GreenBrew",
+        value=st.session_state.get("brand_name", "")
     )
 
     brand_desc = st.text_area(
         "Brand Description",
         placeholder="e.g. Eco-friendly coffee shop targeting young professionals",
-        height=120
+        height=120,
+        value=st.session_state.get("brand_desc", "")
     )
 
     industry = st.selectbox(
@@ -52,15 +54,17 @@ with col1:
 
     target_audience = st.text_input(
         "Target Audience",
-        placeholder="e.g. Young professionals aged 25-35"
+        placeholder="e.g. Young professionals aged 25-35",
+        value=st.session_state.get("target_audience", "")
     )
 
     # Example button
     if st.button("✨ Try an Example"):
         st.session_state["brand_name"] = "GreenBrew"
         st.session_state["brand_desc"] = "Eco-friendly coffee shop targeting young professionals who care about sustainability"
+        st.session_state["industry"] = "Food & Beverage"
         st.session_state["target_audience"] = "Young professionals aged 25-35"
-        st.info("Example loaded! Click Generate to see it in action.")
+        st.rerun()
 
     st.markdown("---")
 
@@ -72,17 +76,21 @@ with col1:
     )
 
 # Output column
+@st.cache_data(ttl=300)
+def cached_brand_copy(brand_name, brand_desc, industry):
+    return generate_brand_copy(brand_name, brand_desc, industry)
 with col2:
     st.markdown("### 🎯 Your Brand Kit")
-
     if generate_btn:
+        st.session_state["regenerate"] = False
         if not brand_name or not brand_desc:
             st.warning("⚠️ Please fill in Brand Name and Description.")
         else:
             # Generate brand copy
             with st.spinner("📝 Generating brand copy..."):
                 try:
-                    brand_data = generate_brand_copy(brand_name, brand_desc, industry)
+                    
+                    brand_data = cached_brand_copy(brand_name, brand_desc, industry)
                     st.success("✅ Brand copy ready!")
                 except Exception as e:
                     st.error(f"❌ Brand copy generation failed: {str(e)}")
@@ -94,13 +102,12 @@ with col2:
                     colors = ", ".join([c["name"] for c in brand_data["colors"]]) if brand_data else ""
                     image_path = generate_logo(brand_name, brand_desc, colors)
                     st.success("✅ Logo concept ready!")
+                    
                 except Exception as e:
                     st.error(f"❌ Logo generation failed: {str(e)}")
                     image_path = None
-
             # Display results
             if brand_data:
-
                 # Tagline
                 st.markdown("#### 🏷️ Brand Tagline")
                 st.info(brand_data["tagline"])
