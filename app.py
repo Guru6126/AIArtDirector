@@ -18,7 +18,25 @@ st.set_page_config(
 st.title("🎨 AI Art Director")
 st.subheader("Instant brand identity kit generator for startups and small businesses")
 st.markdown("---")
-
+# Sidebar
+with st.sidebar:
+    st.image("https://img.icons8.com/color/96/000000/paint-palette.png", width=80)
+    st.title("How to use")
+    st.markdown("""
+    **Step 1** — Enter your brand name
+    
+    **Step 2** — Describe your brand
+    
+    **Step 3** — Select your industry
+    
+    **Step 4** — Enter target audience
+    
+    **Step 5** — Click Generate Brand Kit!
+    """)
+    st.markdown("---")
+    st.markdown("### 💡 Tips")
+    st.info("Be specific in your description for better results!")
+    st.info("Try different industries for varied color palettes!")
 # Two column layout
 col1, col2 = st.columns([1, 1])
 
@@ -118,18 +136,29 @@ with col2:
                 cols = st.columns(5)
                 for i, color in enumerate(brand_data["colors"]):
                     with cols[i]:
+                        hex_color = color.get("hex") or color.get("hex_code") or color.get("color") or "#000000"
                         st.markdown(
-                            f'<div style="background:{color["hex"]}; '
+                            f'<div style="background:{hex_color}; '
                             f'padding:30px; border-radius:8px;"></div>',
                             unsafe_allow_html=True
                         )
-                        st.caption(f"{color['name']}\n{color['hex']}")
+                st.caption(f"{color['name']}\n{hex_color}")
                 st.markdown("---")
 
                 # Ad copies
                 st.markdown("#### 📢 Ad Copy")
                 for i, copy in enumerate(brand_data["ad_copies"], 1):
-                    st.success(f"{i}. {copy}")
+                    st.markdown(
+                        f"""
+                        <div style='background:#1e1e2e; padding:15px; 
+                        border-radius:10px; border-left:4px solid #7c3aed;
+                        margin-bottom:10px;'>
+                            <p style='color:white; margin:0;'>
+                            <b>Ad Copy {i}</b><br>{copy}</p>
+                        </div>
+                        """,
+                        unsafe_allow_html=True
+                    )
                 st.markdown("---")
 
             # Display logo
