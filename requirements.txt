@@ -1,4 +1,5 @@
 streamlit
-anthropic
-replicate
+groq
 python-dotenv
+requests
+Pillow
