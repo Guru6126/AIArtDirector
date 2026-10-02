@@ -9,7 +9,9 @@ load_dotenv()
 # Initialize client
 client = Groq(api_key=os.getenv("GROQ_API_KEY"))
 
-def generate_brand_copy(brand_name, brand_description, industry):
+def generate_brand_copy(brand_name, brand_description, industry, api_key=None):
+    key = api_key or os.getenv("GROQ_API_KEY", "")
+    client = Groq(api_key=key)
     prompt = f"""
     You are a brand strategist. Given this brand info, return ONLY a JSON object with:
     - tagline (string)

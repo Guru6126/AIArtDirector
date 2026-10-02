@@ -37,6 +37,32 @@ with st.sidebar:
     st.markdown("### 💡 Tips")
     st.info("Be specific in your description for better results!")
     st.info("Try different industries for varied color palettes!")
+
+    st.markdown("---")
+    with st.expander("🔑 API Keys (Required)", expanded=False):
+        st.markdown("Enter your API keys below. These are required to generate brand kits.")
+        
+        groq_key_input = st.text_input(
+            "Groq API Key",
+            type="password",
+            placeholder="gsk_...",
+            value=st.session_state.get("groq_api_key", os.getenv("GROQ_API_KEY", ""))
+        )
+        hf_key_input = st.text_input(
+            "HuggingFace API Key",
+            type="password",
+            placeholder="hf_...",
+            value=st.session_state.get("hf_api_key", os.getenv("HUGGINGFACE_API_KEY", "").strip())
+        )
+        if st.button("💾 Save Keys"):
+            st.session_state["groq_api_key"] = groq_key_input.strip()
+            st.session_state["hf_api_key"] = hf_key_input.strip()
+            st.success("✅ Keys saved for this session!")
+
+        st.caption("🔒 Keys are only stored in your session and never saved permanently.")
+        st.markdown("Get your keys here:")
+        st.markdown("- [Groq API Key](https://console.groq.com/keys)")
+        st.markdown("- [HuggingFace API Key](https://huggingface.co/settings/tokens)")
 # Two column layout
 col1, col2 = st.columns([1, 1])
 
@@ -95,32 +121,36 @@ with col1:
 
 # Output column
 @st.cache_data(ttl=300)
-def cached_brand_copy(brand_name, brand_desc, industry):
-    return generate_brand_copy(brand_name, brand_desc, industry)
+def cached_brand_copy(brand_name, brand_desc, industry, groq_key):
+    return generate_brand_copy(brand_name, brand_desc, industry, groq_key)
 with col2:
     st.markdown("### 🎯 Your Brand Kit")
     if generate_btn:
         st.session_state["regenerate"] = False
+        groq_key = st.session_state.get("groq_api_key", os.getenv("GROQ_API_KEY", "")).strip()
+        hf_key = st.session_state.get("hf_api_key", os.getenv("HUGGINGFACE_API_KEY", "").strip()).strip()
+
         if not brand_name or not brand_desc:
             st.warning("⚠️ Please fill in Brand Name and Description.")
+        elif not groq_key or not hf_key:
+            st.warning("⚠️ Please enter your API keys in the **🔑 API Keys** section in the sidebar.")
         else:
             # Generate brand copy
             with st.spinner("📝 Generating brand copy..."):
                 try:
-                    
-                    brand_data = cached_brand_copy(brand_name, brand_desc, industry)
+                    brand_data = cached_brand_copy(brand_name, brand_desc, industry, groq_key)
                     st.success("✅ Brand copy ready!")
                 except Exception as e:
                     st.error(f"❌ Brand copy generation failed: {str(e)}")
                     brand_data = None
 
             # Generate logo
+            image_path = None
             with st.spinner("🖼️ Generating logo concept... this may take 10-15 seconds"):
                 try:
                     colors = ", ".join([c["name"] for c in brand_data["colors"]]) if brand_data else ""
-                    image_path = generate_logo(brand_name, brand_desc, colors)
+                    image_path = generate_logo(brand_name, brand_desc, colors, hf_key)
                     st.success("✅ Logo concept ready!")
-                    
                 except Exception as e:
                     st.error(f"❌ Logo generation failed: {str(e)}")
                     image_path = None
@@ -131,7 +161,6 @@ with col2:
                 st.info(brand_data["tagline"])
                 st.markdown("---")
 
-                # Color palette
                 st.markdown("#### 🎨 Color Palette")
                 cols = st.columns(5)
                 for i, color in enumerate(brand_data["colors"]):
@@ -142,7 +171,7 @@ with col2:
                             f'padding:30px; border-radius:8px;"></div>',
                             unsafe_allow_html=True
                         )
-                st.caption(f"{color['name']}\n{hex_color}")
+                        st.caption(f"{color['name']}\n{hex_color}")
                 st.markdown("---")
 
                 # Ad copies

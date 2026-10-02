@@ -7,12 +7,15 @@ import io
 # Load API key from .env
 load_dotenv()
 
-API_KEY = os.getenv("HUGGINGFACE_API_KEY")
-API_URL = "https://router.huggingface.co/hf-inference/models/stabilityai/stable-diffusion-xl-base-1.0"
+API_KEY = os.getenv("HUGGINGFACE_API_KEY", "").strip()
+API_URL = "https://api-inference.huggingface.co/models/stabilityai/stable-diffusion-xl-base-1.0"
 
 headers = {"Authorization": f"Bearer {API_KEY}"}
 
-def generate_logo(brand_name, brand_description, colors):
+def generate_logo(brand_name, brand_description, colors, api_key=None):
+    key = api_key or API_KEY
+    current_headers = {"Authorization": f"Bearer {key}"}
+
     prompt = f"""
     {brand_description} logo icon,
     {colors} colors,
@@ -41,7 +44,7 @@ def generate_logo(brand_name, brand_description, colors):
         }
     }
 
-    response = requests.post(API_URL, headers=headers, json=payload)
+    response = requests.post(API_URL, headers=current_headers, json=payload)
 
     if response.status_code == 200:
         image = Image.open(io.BytesIO(response.content))
